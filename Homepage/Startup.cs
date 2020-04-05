@@ -70,12 +70,19 @@ namespace Homepage
             {
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                // app.UseHsts();
 
-                app.UseForwardedHeaders(new ForwardedHeadersOptions
+                var forwardedHeadersOptions = new ForwardedHeadersOptions
                 {
                     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-                });
+                };
+
+                // NOTICE: 주의할 점, 기본 옵션에 loopback이 들어가 있는데 docker를 이용해서 띄운다면 localhost가 아니므로 검사를 건너뛰거나 추가하거나 해야한다
+                //         여기 KnowNetworks, KnownProxies리스트에 한개라도 있으면 Known에서 검사하고, 아니라면 그냥 통과한다
+                forwardedHeadersOptions.KnownNetworks.Clear();
+                forwardedHeadersOptions.KnownProxies.Clear();
+
+                app.UseForwardedHeaders(forwardedHeadersOptions);
             }
             
             app.UseStaticFiles();
