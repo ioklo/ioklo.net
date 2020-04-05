@@ -40,15 +40,13 @@ namespace Homepage
                 {
                     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = FacebookDefaults.AuthenticationScheme;
-                })      
-                .AddCookie(options =>
-                {
-                    options.Cookie.Name = "auth";
                 })
+                .AddCookie()
                 .AddFacebook(options =>
                 {
                     options.AppId = Configuration["Authentication:Facebook:AppId"];
                     options.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+                    // options.CallbackPath = Configuration["Authentication:Facebook:CallbackPath"];
                 });
             
             var mvcBuilder = services.AddControllersWithViews();
@@ -66,6 +64,7 @@ namespace Homepage
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseHttpsRedirection();
             }
             else
             {
@@ -78,8 +77,7 @@ namespace Homepage
                     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
                 });
             }
-
-            app.UseHttpsRedirection();
+            
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -91,14 +89,13 @@ namespace Homepage
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
-            {   
+            {
                 endpoints.MapGet("/SignOut", async context =>
                     {
                         await context.SignOutAsync();
                         context.Response.Cookies.Delete("loggedIn");
                         await context.Response.WriteAsync("<script>window.opener.updateStatus(); self.opener = self;window.close();</script>");
-                    })
-                    .RequireAuthorization();
+                    });
 
                 endpoints.MapControllerRoute("main", "{action=Index}/{id?}", new { controller = "Main" });
             });
