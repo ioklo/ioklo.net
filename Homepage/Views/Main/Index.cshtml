@@ -2,179 +2,204 @@
 @{
     ViewData["Title"] = "Home page";
 }
-    <div class="container">
 
-        <div class="text-left">
-            <h1 class="display-4">&lt;IOKLO.net</h1>
-        </div>
+@section Scripts{
 
-        <div id="form-box" class="row">
-            <div class="col">
-                <!-- 필요한 것, -->
-                <form asp-action="Post" method="post">
-                    <div class="input-group">
-                        <input class="form-control" name="Text" type="text" placeholder="글 남기기" />
-                        <div class="input-group-append">
-                            <button class="btn btn btn-primary" type="submit">남기기</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
+    <script>
+        var bLoggedIn;
 
-        <ul id="comments" class="list-unstyled">
+        function updateStatus() {
 
+            bLoggedIn = $.cookie('loggedIn') == "true";
 
-            @foreach (var commentVM in Model.CommentVMs)
-            {
-                <li class="pt-2">
-                    <div class="row border rounded m-0">
-                        <div class="col-1 text-right bg-light border-right p-2"><span class="font-weight-bold">@commentVM.UserName</span></div>
-                        <div class="col p-2">@commentVM.Text</div>
-                        <div class="col-auto text-right p-2">@commentVM.DateText</div>
-                    </div>
-                </li>
+            if (bLoggedIn) {
+                $('#setting-button').text('설정');
+                $('#comment-text').attr('placeholder', '글을 남겨주세요')
+                $('#submit-button').removeClass('disabled');                
+            }
+            else {
+                $('#setting-button').text('로그인');
+                $('#comment-text').attr('placehodler', '글을 남기시려면 로그인을 해주세요');
+                $('#submit-button').addClass('disabled');
+                $('#setting-box').collapse('hide');
+            }
+        }
+
+        function onSettingButtonClicked() {
+            if (!bLoggedIn)
+                window.open("/SignIn", "_blank", "width=500,height=600");
+            else {
+                $('#setting-box').collapse('toggle');
+            }
+        }
+
+        function onLogoutButtonClicked() {
+            if (bLoggedIn)
+                window.open("/SignOut", "_blank", "width=500,height=600");
+        }
+
+        function onChangeNameButtonClicked() {
+
+            var nameText = $('#change-name-text').val();
+            if (nameText == '') {
+                alert('변경할 이름을 입력해 주세요')
+                return;
             }
 
-            <li class="card mt-2">
-                <div class="card-header px-3 py-2">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <span class="font-weight-bold">IOKLO</span><span class="ml-2">2020-03-30 19:00</span>
-                        </div>
-                        <div class="col-1 text-right">
-                            <button class="btn btn-sm btn-secondary">삭제</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body px-3 py-3">잘 지내셨습니까</div>
-            </li>
+            $.post('/ChangeName', { name: nameText }, function () {
+                alert('변경되었습니다');
+                location.reload();
+            });
+        }
+        
+        updateStatus();
+    </script>
+}
+<div class="container">
 
-            <li class="card mt-2">
-                <div class="card-header px-3 py-2">
-                    <div class="row">
-                        <div class="col align-self-center">
-                            <span class="font-weight-bold">IOKLO</span><span class="ml-2">2020-03-30 19:00</span>
-                        </div>
-                        <div class="col-1 text-right">
-                            <button class="btn btn-sm btn-secondary">삭제</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body px-3 py-3">잘 지내셨습니까</div>
-            </li>
-
-            <li class="pt-2">
-                <div class="row border rounded m-0">
-                    <div class="col-1 text-right bg-light border-right p-2"><span class="font-weight-bold">IOKLO</span></div>
-                    <div class="col p-2">잘 지내셨습니까</div>
-                    <div class="col-auto text-right p-2">방금</div>
-                </div>
-            </li>
-
-            <li class="pt-2">
-                <div class="row border rounded m-0">
-                    <div class="col-1 text-right bg-light border-right p-2"><span class="font-weight-bold">하늘보리</span></div>
-                    <div class="col p-2">네 잘 지내고 있습니다</div>
-                    <div class="col-auto text-right p-2"> 1초 전</div>
-                </div>
-            </li>
-
-            <li class="pt-2">
-                <div class="row border rounded m-0">
-                    <div class="col-1 text-right bg-light border-right p-2"><span class="font-weight-bold">하늘보리</span></div>
-                    <div class="col p-2">네 잘 지내고 있습니다</div>
-                    <div class="col-auto text-right p-2">10초 전</div>
-                </div>
-            </li>
-
-            <li class="pt-2">
-                <div class="row border rounded m-0">
-                    <div class="col-1 text-right bg-light border-right p-2"><span class="font-weight-bold">하늘보리</span></div>
-                    <div class="col p-2">네 잘 지내고 있습니다</div>
-                    <div class="col-auto text-right p-2">1일 전</div>
-                </div>
-            </li>
-
-            <li class="pt-2">
-                <div class="row border rounded m-0">
-                    <div class="col-1 text-right bg-light border-right p-2"><span class="font-weight-bold">하늘보리</span></div>
-                    <div class="col p-2">네 잘 지내고 있습니다</div>
-                    <div class="col-auto text-right p-2">2019-03-03</div>
-                </div>
-            </li>
-
-            <li class="pt-2">
-                <div class="row border rounded m-0">
-                    <div class="col-1 text-right bg-light border-right p-2"><span class="font-weight-bold">하늘보리</span></div>
-                    <div class="col p-2">네 잘 지내고 있습니다</div>
-                    <div class="col-auto text-right p-2">2010-03-03</div>
-                </div>
-            </li>
-
-            <li class="pt-2">
-                <div class="row border rounded m-0">
-                    <div class="col-1 text-right bg-light border-right p-2"><span class="font-weight-bold">IOKLO</span></div>
-                    <div class="col p-2">잘 지내셨습니까</div>
-                    <div class="col-auto text-right p-2">2001-03-03</div>
-                </div>
-                <span class="close">x</span>
-            </li>
-
-        </ul>
-
-        <script>
-            function onStatusChanged(response) {  // Called with the results from FB.getLoginStatus().
-                console.log('onStatusChanged');
-                console.log(response);                   // The current login status of the person.
-                if (response.status === 'connected') {   // Logged into your webpage and Facebook.
-                    testAPI();
-                } else {                                 // Not logged into your webpage or we are unable to tell.
-                    document.getElementById('status').innerHTML = 'Please log ' +
-                        'into this webpage.';
-                }
-            }
-
-            function checkLoginState() {               // Called when a person is finished with the Login Button.
-                FB.getLoginStatus(onStatusChanged);
-            }
-
-            function testAPI() {                      // Testing Graph API after login.  See onStatusChanged() for when this call is made.
-                console.log('Welcome!  Fetching your information.... ');
-                FB.api('/me', function (response) {
-                    console.log('Successful login for: ' + response.name);
-                    document.getElementById('status').innerHTML =
-                        'Thanks for logging in, ' + response.name + '!';
-                });
-            }
-
-            window.fbAsyncInit = function () {
-                FB.init({
-                    appId: '1363432377195073',
-                    status: true,
-                    cookie: true,
-                    xfbml: true,
-                    version: 'v6.0'
-                });
-
-                // 시작하면
-
-                /*FB.Event.subscribe('auth.logout', function (response) {
-                    onStatusChanged(response);
-                });
-
-                FB.Event.subscribe('auth.statusChange', function (response) {
-                    onStatusChanged(response);
-                });*/
-
-                checkLoginState();
-            };
-        </script>
-        <script async defer src="https://connect.facebook.net/ko_KR/sdk.js"></script>
-
-        <div class="fb-login-button" data-width="" data-size="small" data-button-type="login_with" data-layout="default" data-auto-logout-link="true" data-use-continue-as="true" onlogout="checkLoginState();"></div>
-
-        <div id="status">
-        </div>
-
+    <div class="text-left">
+        <h1 class="display-4">&lt;IOKLO.net</h1>
     </div>
+
+
+    <div id="form-box" class="row">
+        <!-- 필요한 것, -->
+        <form asp-action="Post" method="post" class="col">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <button class="btn btn-info" type="button" id="setting-button" onclick="onSettingButtonClicked();"></button>
+                </div>
+                <input class="form-control" id="comment-text" name="text" type="text" placeholder="글을 남기시려면 로그인을 해주세요" />
+                <div class="input-group-append">
+                    <button id="submit-button" class="btn btn-primary" type="submit">남기기</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div id="setting-box" class="p-3 border bg-light collapse">
+        <div class="row">
+            <div class="col-4">
+
+                <div class="input-group mb-3">
+                    <input class="form-control" id="change-name-text" name="text" type="text" placeholder="바꿀 이름을 입력하세요" />
+                    <div class="input-group-append">
+                        <button class="btn btn-secondary" type="button" onclick="onChangeNameButtonClicked();">이름 변경</button>
+                    </div>
+                </div>
+
+                <div class="input-group mb-3">
+                    <button class="btn btn-secondary" onclick="onLogoutButtonClicked();">로그아웃</button>
+                </div>
+            </div>
+            <div class="col-8">
+
+            </div>            
+        </div>
+    </div>
+    <ul id="comments" class="list-unstyled">
+
+
+        @foreach (var commentVM in Model.CommentVMs)
+        {
+            <li class="pt-2">
+                <div class="row border rounded m-0">
+                    <div class="col-1 text-right bg-light border-right p-2"><span class="font-weight-bold">@commentVM.UserName</span></div>
+                    <div class="col p-2">@commentVM.Text</div>
+                    <div class="col-auto text-right p-2">@commentVM.DateText</div>
+                </div>
+            </li>
+        }
+
+        <li class="card mt-2">
+            <div class="card-header px-3 py-2">
+                <div class="row">
+                    <div class="col align-self-center">
+                        <span class="font-weight-bold">IOKLO</span><span class="ml-2">2020-03-30 19:00</span>
+                    </div>
+                    <div class="col-1 text-right">
+                        <button class="btn btn-sm btn-secondary">삭제</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body px-3 py-3">잘 지내셨습니까</div>
+        </li>
+
+        <li class="card mt-2">
+            <div class="card-header px-3 py-2">
+                <div class="row">
+                    <div class="col align-self-center">
+                        <span class="font-weight-bold">IOKLO</span><span class="ml-2">2020-03-30 19:00</span>
+                    </div>
+                    <div class="col-1 text-right">
+                        <button class="btn btn-sm btn-secondary">삭제</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body px-3 py-3">잘 지내셨습니까</div>
+        </li>
+
+        <li class="pt-2">
+            <div class="row border rounded m-0">
+                <div class="col-1 text-right bg-light border-right p-2"><span class="font-weight-bold">IOKLO</span></div>
+                <div class="col p-2">잘 지내셨습니까</div>
+                <div class="col-auto text-right p-2">방금</div>
+            </div>
+        </li>
+
+        <li class="pt-2">
+            <div class="row border rounded m-0">
+                <div class="col-1 text-right bg-light border-right p-2"><span class="font-weight-bold">하늘보리</span></div>
+                <div class="col p-2">네 잘 지내고 있습니다</div>
+                <div class="col-auto text-right p-2"> 1초 전</div>
+            </div>
+        </li>
+
+        <li class="pt-2">
+            <div class="row border rounded m-0">
+                <div class="col-1 text-right bg-light border-right p-2"><span class="font-weight-bold">하늘보리</span></div>
+                <div class="col p-2">네 잘 지내고 있습니다</div>
+                <div class="col-auto text-right p-2">10초 전</div>
+            </div>
+        </li>
+
+        <li class="pt-2">
+            <div class="row border rounded m-0">
+                <div class="col-1 text-right bg-light border-right p-2"><span class="font-weight-bold">하늘보리</span></div>
+                <div class="col p-2">네 잘 지내고 있습니다</div>
+                <div class="col-auto text-right p-2">1일 전</div>
+            </div>
+        </li>
+
+        <li class="pt-2">
+            <div class="row border rounded m-0">
+                <div class="col-1 text-right bg-light border-right p-2"><span class="font-weight-bold">하늘보리</span></div>
+                <div class="col p-2">네 잘 지내고 있습니다</div>
+                <div class="col-auto text-right p-2">2019-03-03</div>
+            </div>
+        </li>
+
+        <li class="pt-2">
+            <div class="row border rounded m-0">
+                <div class="col-1 text-right bg-light border-right p-2"><span class="font-weight-bold">하늘보리</span></div>
+                <div class="col p-2">네 잘 지내고 있습니다</div>
+                <div class="col-auto text-right p-2">2010-03-03</div>
+            </div>
+        </li>
+
+        <li class="pt-2">
+            <div class="row border rounded m-0">
+                <div class="col-1 text-right bg-light border-right p-2"><span class="font-weight-bold">IOKLO</span></div>
+                <div class="col p-2">잘 지내셨습니까</div>
+                <div class="col-auto text-right p-2">2001-03-03</div>
+            </div>
+            <span class="close">x</span>
+        </li>
+
+    </ul>
+
+    <div id="status">
+    </div>
+
+</div>
+

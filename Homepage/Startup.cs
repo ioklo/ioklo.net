@@ -1,10 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Homepage.DbModels;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
@@ -28,8 +34,23 @@ namespace Homepage
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<MainDbContext>(optionBuilder => optionBuilder.UseSqlite("Data Source=main.db"));
+            services.AddDbContext<MainDbContext>(optionBuilder => optionBuilder.UseSqlite("Data Source=db/main.db"));
 
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = FacebookDefaults.AuthenticationScheme;
+                })      
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = "auth";
+                })
+                .AddFacebook(options =>
+                {
+                    options.AppId = Configuration["Authentication:Facebook:AppId"];
+                    options.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+                });
+            
             var mvcBuilder = services.AddControllersWithViews();
 #if DEBUG
             if (Env.IsDevelopment())
@@ -56,7 +77,6 @@ namespace Homepage
                 {
                     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
                 });
-                app.UseAuthentication();
             }
 
             app.UseHttpsRedirection();
@@ -64,10 +84,22 @@ namespace Homepage
 
             app.UseRouting();
 
+            app.UseMiddleware<DebugMiddleware>();
+
+            app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
-            {
+            {   
+                endpoints.MapGet("/SignOut", async context =>
+                    {
+                        await context.SignOutAsync();
+                        context.Response.Cookies.Delete("loggedIn");
+                        await context.Response.WriteAsync("<script>window.opener.updateStatus(); self.opener = self;window.close();</script>");
+                    })
+                    .RequireAuthorization();
+
                 endpoints.MapControllerRoute("main", "{action=Index}/{id?}", new { controller = "Main" });
             });
         }
