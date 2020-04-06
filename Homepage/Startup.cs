@@ -101,7 +101,10 @@ namespace Homepage
                     {
                         await context.SignOutAsync();
                         context.Response.Cookies.Delete("loggedIn");
+                        context.Response.ContentType = "text/html";
+
                         await context.Response.WriteAsync("<script>window.opener.updateStatus(); self.opener = self;window.close();</script>");
+
                     });
 
                 endpoints.MapControllerRoute("main", "{action=Index}/{id?}", new { controller = "Main" });

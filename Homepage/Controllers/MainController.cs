@@ -44,8 +44,7 @@ namespace Homepage.Controllers
             }
 
             Response.Cookies.Append("loggedIn", "true");
-            await Response.WriteAsync("<script>window.opener.updateStatus(); self.opener = self; window.close();</script>");
-            return Ok();
+            return Content("<script>window.opener.updateStatus(); self.opener = self; window.close();</script>", "text/html");
         }
 
         public IActionResult Index()
