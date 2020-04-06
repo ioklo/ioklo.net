@@ -100,7 +100,7 @@ namespace Homepage
                 endpoints.MapGet("/SignOut", async context =>
                     {
                         await context.SignOutAsync();
-                        context.Response.Cookies.Delete("loggedIn");
+                        context.Response.Cookies.Delete("loginName");
                         context.Response.ContentType = "text/html";
 
                         await context.Response.WriteAsync("<script>window.opener.updateStatus(); self.opener = self;window.close();</script>");

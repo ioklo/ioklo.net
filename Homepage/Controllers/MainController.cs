@@ -43,7 +43,7 @@ namespace Homepage.Controllers
                 await dbContext.SaveChangesAsync();
             }
 
-            Response.Cookies.Append("loggedIn", "true");
+            Response.Cookies.Append("loginName", dbUser.Name);
             return Content("<script>window.opener.updateStatus(); self.opener = self; window.close();</script>", "text/html");
         }
 
@@ -78,6 +78,7 @@ namespace Homepage.Controllers
 
             dbUser.Name = name;
             await dbContext.SaveChangesAsync();
+            Response.Cookies.Append("loginName", name);
             return Ok();
         }
         
