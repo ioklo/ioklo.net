@@ -39,7 +39,8 @@ namespace Homepage.Controllers
             var dbUser = await dbContext.Users.SingleOrDefaultAsync(u => nameId.Value == u.FacebookNameId);
             if (dbUser == null)
             {
-                dbContext.Users.Add(new DbUser() { FacebookNameId = nameId.Value, Name = User.Identity.Name });
+                dbUser = new DbUser() { FacebookNameId = nameId.Value, Name = User.Identity.Name };
+                dbContext.Users.Add(dbUser);
                 await dbContext.SaveChangesAsync();
             }
 
