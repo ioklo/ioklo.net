@@ -1,8 +1,8 @@
 ###############################################################################
 # Set default behavior to automatically normalize line endings.
 ###############################################################################
-* text=auto
-Homepage/wwwroot/qs/_framework/* binary
+* -text
+# Homepage/wwwroot/qs/_framework/* -text binary 
 
 ###############################################################################
 # Set default behavior for command prompt diff.
