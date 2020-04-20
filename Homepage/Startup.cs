@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -86,8 +87,16 @@ namespace Homepage
 
                 app.UseForwardedHeaders(forwardedHeadersOptions);
             }
-            
-            app.UseStaticFiles();
+
+            var provider = new FileExtensionContentTypeProvider();
+            // Add new mappings
+            provider.Mappings[".dll"] = "application/octet-stream";
+            provider.Mappings[".json"] = "application/json";
+            provider.Mappings[".wasm"] = "application/wasm";
+            provider.Mappings[".woff"] = "application/font-woff";
+            provider.Mappings[".woff2"] = "application/font-woff";
+
+            app.UseStaticFiles(new StaticFileOptions() { ContentTypeProvider = provider });
 
             app.UseRouting();
 
