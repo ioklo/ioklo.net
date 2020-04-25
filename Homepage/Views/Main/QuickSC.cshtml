@@ -53,12 +53,18 @@
         require(['vs/editor/editor.main'], function () {
             window.editor = monaco.editor.create(document.getElementById('editor'), {
                 value: [
-                    'int sum = 0;',
-                    'for(int i = 0; i < 5; i++)',
+                    'void Func(int x)',
                     '{',
-                    '    sum = sum + i; // i를 누적합니다',
-                    '    @@echo (i: $i, sum: $sum)\\n',
-                    '}'
+                    '    int sum = 0; ',
+                    '    for(int i = 0; i < x; i++)',
+                    '    {',
+                    '        sum = sum + i; // i를 누적합니다',
+                    '        @@echo (i: $i, sum: $sum)\\n',
+                    '    }',
+                    '}',
+                    '',
+                    'Func(3);',
+                    'Func(5);'
                 ].join('\n'),
                 language: 'csharp',
                 minimap: {
