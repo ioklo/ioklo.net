@@ -49,6 +49,8 @@ namespace Homepage
                     options.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
                     // options.CallbackPath = Configuration["Authentication:Facebook:CallbackPath"];
                 });
+
+            services.AddServerSideBlazor();
             
             var mvcBuilder = services.AddControllersWithViews();
 #if DEBUG
@@ -65,9 +67,9 @@ namespace Homepage
             app.UseDeveloperExceptionPage();
 
             if (env.IsDevelopment())
-            {
-                
+            {   
                 app.UseHttpsRedirection();
+                app.UseWebAssemblyDebugging();
             }
             else
             {
@@ -88,7 +90,7 @@ namespace Homepage
                 app.UseForwardedHeaders(forwardedHeadersOptions);
             }
 
-            var provider = new FileExtensionContentTypeProvider();
+            /*var provider = new FileExtensionContentTypeProvider();
             // Add new mappings
             provider.Mappings[".dll"] = "application/octet-stream";
             provider.Mappings[".json"] = "application/json";
@@ -97,6 +99,10 @@ namespace Homepage
             provider.Mappings[".woff2"] = "application/font-woff";
 
             app.UseStaticFiles(new StaticFileOptions() { ContentTypeProvider = provider });
+            */
+
+            app.UseBlazorFrameworkFiles();
+            app.UseStaticFiles();
 
             app.UseRouting();
 

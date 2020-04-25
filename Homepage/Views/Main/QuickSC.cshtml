@@ -1,0 +1,74 @@
+﻿@{
+    ViewData["Title"] = "QuickSC";
+}
+
+<div class="d-flex flex-column container h-100">
+
+    <div class="flex-grow-0 flex-shrink-0 p-2">
+        <h1>Scratch Pad</h1>
+        <button type="button" class="btn btn-primary" onclick="onRunButtonClick();">Run</button>
+        <button type="button" class="btn btn-secondary">Examples</button>
+    </div>
+
+    <div id="editor" class="flex-grow-1 flex-shrink-1 border rounded-top overflow-hidden">
+    </div>
+
+    <div class="py-2">
+        <pre id="result" class="flex-grow-0 flex-shrink-0 border bg-white" style="height: 200px;">result</pre>
+    </div>
+
+    <app class="d-none">Loading...</app>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+</div>
+
+@section Scripts{
+
+    <script src="~/lib/monaco-editor/min/vs/loader.js"></script>
+    <script>
+
+        $('html').height('100%');
+        $('body').height('100%');
+        $('main').height('100%');
+
+        function onResize() {
+            window.editor.layout();
+        }
+
+        async function onRunButtonClick() {
+
+            var code = window.editor.getValue();
+            var text = await DotNet.invokeMethodAsync('Homepage.QuickSC', 'RunAsync', code);
+
+            $('#result').text(text.result);
+        }
+
+        require.config({ paths: { 'vs': 'lib/monaco-editor/min/vs' } });
+
+        require(['vs/editor/editor.main'], function () {
+            window.editor = monaco.editor.create(document.getElementById('editor'), {
+                value: [
+                    'int sum = 0;',
+                    'for(int i = 0; i < 5; i++)',
+                    '{',
+                    '    sum = sum + i; // i를 누적합니다',
+                    '    @@echo (i: $i, sum: $sum)\\n',
+                    '}'
+                ].join('\n'),
+                language: 'csharp',
+                minimap: {
+                    enabled: false
+                }
+
+            });
+        });
+    </script>
+
+    <script src="~/_framework/blazor.webassembly.js"></script>
+}
+
