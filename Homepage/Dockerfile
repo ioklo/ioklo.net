@@ -7,7 +7,7 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
-COPY ["Homepage/Homepage.csproj", "External/QuickSC.Core/QuickSC.Core.csproj", "External/QuickSC.Infra/QuickSC.Infra.csproj", "External/QuickSC.Syntax/QuickSC.Syntax.csproj", "."]
+COPY ["Homepage/Homepage.csproj", "External/QuickSC/QuickSC.Core/QuickSC.Core.csproj", "External/QuickSC/QuickSC.Infra/QuickSC.Infra.csproj", "External/QuickSC/QuickSC.Syntax/QuickSC.Syntax.csproj", "."]
 RUN dotnet restore "Homepage/Homepage.csproj"
 COPY [".", "."]
 WORKDIR "/src/Homepage"
