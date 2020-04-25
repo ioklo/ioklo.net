@@ -10,6 +10,7 @@ WORKDIR /src
 COPY ["External/QuickSC/QuickSC.Core/QuickSC.Core.csproj", "External/QuickSC/QuickSC.Core/"]
 COPY ["External/QuickSC/QuickSC.Infra/QuickSC.Infra.csproj", "External/QuickSC/QuickSC.Infra/"]
 COPY ["External/QuickSC/QuickSC.Syntax/QuickSC.Syntax.csproj", "External/QuickSC/QuickSC.Syntax/"]
+COPY ["Homepage.QuickSC/Homepage.QuickSC.csproj", "Homepage.QuickSC/"]
 COPY ["Homepage/Homepage.csproj", "Homepage/"]
 RUN dotnet restore "Homepage/Homepage.csproj"
 COPY [".", "."]
