@@ -18,15 +18,29 @@ namespace QuickSC.Shell
                 var evaluator = new QsEvaluator(cmdProvider);
                 var evalContext = QsEvalContext.Make();
 
-                var input = @"
-int F(int i, string j)
-{
-    @echo $i $j
-    return 3 + i;
-}
+                //                var input = @"
+                //int i = 7;
 
-var x = F(3, ""hi"");
-@echo $x
+                //int F(int i, string j)
+                //{
+                //    @echo $i $j
+                //    i = i + 3;
+                //    return i;
+                //}
+
+                //var x = F(3, ""hi"");
+                //@echo $x
+                //";
+
+                var input = @"
+int x = 3;
+var f = i => {
+    @echo $i $x
+    x++;
+};
+
+f(2);
+f(3);
 ";
                 var buffer = new QsBuffer(new StringReader(input));
                 var pos = await buffer.MakePosition().NextAsync();
@@ -55,7 +69,7 @@ var x = F(3, ""hi"");
         static async Task Main2(string[] args)
         {
             var lexer = new QsLexer();
-            var stmtParser = new QsStmtParser(lexer);
+            var parser = new QsParser(lexer);
 
             var cmdProvider = new QsCmdCommandProvider();
             var evaluator = new QsEvaluator(cmdProvider);
@@ -96,7 +110,7 @@ var x = F(3, ""hi"");
 
                     sb.Clear();
 
-                    var stmtResult = await stmtParser.ParseStmtAsync(parserContext);
+                    var stmtResult = await parser.ParseStmtAsync(parserContext);
                     if (!stmtResult.HasValue)
                     {
                         Console.WriteLine("파싱에 실패했습니다");
