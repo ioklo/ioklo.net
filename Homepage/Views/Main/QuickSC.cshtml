@@ -40,12 +40,17 @@
             window.editor.layout();
         }
 
+        window.writeConsole = function (text) {
+            var t = $('#result').text();
+            $('#result').text(t + text);
+        }
+
         async function onRunButtonClick() {
 
-            var code = window.editor.getValue();
-            var text = await DotNet.invokeMethodAsync('Homepage.QuickSC', 'RunAsync', code);
+            $('#result').text('');
 
-            $('#result').text(text.result);
+            var code = window.editor.getValue();
+            await DotNet.invokeMethodAsync('Homepage.QuickSC', 'RunAsync', code);
         }
 
         require.config({ paths: { 'vs': 'lib/monaco-editor/min/vs' } });
@@ -53,18 +58,38 @@
         require(['vs/editor/editor.main'], function () {
             window.editor = monaco.editor.create(document.getElementById('editor'), {
                 value: [
-                    'void Func(int x)',
+                    'int count = 0;',
+                    '',
+                    'await // local scope 안의 awaitable(async/task)을 모아서 기다립니다',
                     '{',
-                    '    int sum = 0; ',
-                    '    for(int i = 0; i < x; i++)',
+                    '    async // 비동기 영역1',
                     '    {',
-                    '        sum = sum + i; // i를 누적합니다',
-                    '        @@echo (i: $i, sum: $sum)\\n',
+                    '        for(int i = 0; i < 4; i++)',
+                    '        {',
+                    '            count++;',
+                    '            @@{',
+                    '                echo 1> $count \\n',
+                    '                sleep 1',
+                    '            }',
+                    '        }',
+                    '    }',
+                    '',
+                    '    async // 비동기 영역2',
+                    '    {',
+                    '        @@sleep 0.5',
+                    '',
+                    '        for(int i = 0; i < 4; i++)',
+                    '        {',
+                    '            count++;',
+                    '            @@{',
+                    '                echo 2> $count \\n',
+                    '                sleep 1',
+                    '            }',
+                    '        }',
                     '    }',
                     '}',
                     '',
-                    'Func(3);',
-                    'Func(5);'
+                    '@@echo 완료!'
                 ].join('\n'),
                 language: 'csharp',
                 minimap: {

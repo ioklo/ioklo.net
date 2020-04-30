@@ -15,6 +15,13 @@ namespace Homepage.QuickSC
 {
     public class Program
     {
+        static IJSRuntime? jsRuntime;
+
+        static async Task WriteAsync(string msg)
+        {
+            await jsRuntime.InvokeVoidAsync("writeConsole", msg);
+        }
+
         public static async Task Main(string[] args)
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -22,32 +29,46 @@ namespace Homepage.QuickSC
 
             builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-            await builder.Build().RunAsync();
+            var host = builder.Build();
+            jsRuntime = host.Services.GetService<IJSRuntime>();
+            await host.RunAsync();
         }
 
         class QsDemoCommandProvider : IQsCommandProvider
         {
-            StringBuilder sb = new StringBuilder();
-
-            public void Execute(string text)
+            public QsDemoCommandProvider()
             {
-                text = text.Trim();
-
-                if (text.StartsWith("echo "))
-                {
-                    sb.Append(text.Substring(5).Replace("\\n", "\n"));
-                }
-                else
-                {
-                    sb.AppendLine($"알 수 없는 명령어 입니다: {text}");
-                }
             }
 
-            public string GetOutput() => sb.ToString();
+            public async Task ExecuteAsync(string text)
+            {
+                try
+                {
+                    text = text.Trim();
+
+                    if (text.StartsWith("echo "))
+                    {
+                        await WriteAsync(text.Substring(5).Replace("\\n", "\n"));
+                    }
+                    else if (text.StartsWith("sleep "))
+                    {
+                        var d = double.Parse(text.Substring(6));
+                        await Task.Delay((int)(1000 * d));
+                    }
+                    else
+                    {
+                        await WriteAsync($"알 수 없는 명령어 입니다: {text}\n");
+                    }
+                }
+                catch (Exception e)
+                {
+                    await WriteAsync(e.ToString() + "\n");
+                }
+            }
         }
 
         [JSInvokable]
-        public static async ValueTask<string> RunAsync(string input)
+        public static async Task<bool> RunAsync(string input)
         {
             try
             {
@@ -59,21 +80,28 @@ namespace Homepage.QuickSC
 
                 var scriptResult = await parser.ParseScriptAsync(parserContext);
                 if (!scriptResult.HasValue)
-                    return "에러 (파싱 실패)";
+                {
+                    await WriteAsync("에러 (파싱 실패)");
+                    return false;
+                }
 
                 var demoCmdProvider = new QsDemoCommandProvider();
 
                 var evaluator = new QsEvaluator(demoCmdProvider);
                 var evalContext = QsEvalContext.Make();
-                var newEvalContext = evaluator.EvaluateScript(scriptResult.Elem, evalContext);
+                var newEvalContext = await evaluator.EvaluateScriptAsync(scriptResult.Elem, evalContext);
                 if (newEvalContext == null)
-                    return "에러 (실행 실패)";
+                {
+                    await WriteAsync("에러 (실행 실패)");
+                    return false;
+                }
 
-                return demoCmdProvider.GetOutput();
+                return true;
             }
             catch (Exception e)
             {
-                return e.ToString();
+                await WriteAsync(e.ToString());
+                return false;
             }
         }
     }
