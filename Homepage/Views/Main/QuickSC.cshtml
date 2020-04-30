@@ -58,7 +58,7 @@
         require(['vs/editor/editor.main'], function () {
             window.editor = monaco.editor.create(document.getElementById('editor'), {
                 value: [
-                    'int count = 0;',
+                    'int count = 0, sum = 0;',
                     '',
                     'await // local scope 안의 awaitable(async/task)을 모아서 기다립니다',
                     '{',
@@ -87,9 +87,15 @@
                     '            }',
                     '        }',
                     '    }',
+                    '',
+                    '    task // 동시 실행 영역..',
+                    '    {',
+                    '        for(int i = 0 ; i< 10; i++)',
+                    '            sum = sum + i;',
+                    '    }',
                     '}',
                     '',
-                    '@@echo 완료!'
+                    '@@echo 완료! $sum'
                 ].join('\n'),
                 language: 'csharp',
                 minimap: {
