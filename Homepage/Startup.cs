@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Homepage.DbModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -40,15 +39,8 @@ namespace Homepage
             services.AddAuthentication(options =>
                 {
                     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = FacebookDefaults.AuthenticationScheme;
                 })
-                .AddCookie()
-                .AddFacebook(options =>
-                {
-                    options.AppId = Configuration["Authentication:Facebook:AppId"];
-                    options.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
-                    // options.CallbackPath = Configuration["Authentication:Facebook:CallbackPath"];
-                });
+                .AddCookie();
 
             services.AddServerSideBlazor();
             
